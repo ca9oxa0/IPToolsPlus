@@ -1,5 +1,4 @@
-# 构建产物（由 repack.ps1 生成）
-IPToolsPlus.exe
+# 构建产物（Program.cs 由 repack.ps1 生成；IPToolsPlus.exe 成品按要求纳入仓库）
 Program.cs
 *.lnk
 
