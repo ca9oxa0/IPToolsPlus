@@ -1,0 +1,19 @@
+# 构建产物（由 repack.ps1 生成）
+IPToolsPlus.exe
+Program.cs
+*.lnk
+
+# 第三方原版软件（非本项目源码）
+IP地址修改器*.exe
+
+# 本机运行数据
+mac_originals.txt
+ip_profiles.json
+dns_history.txt
+
+# IDE / 临时文件
+.screenshots/
+.trae/
+.tmp/
+documents/
+*.log
