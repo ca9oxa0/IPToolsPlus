@@ -767,7 +767,17 @@ $btnScanStop.Add_Click({
     $scanStatus.Text = '已停止（{0:N0}/{1:N0}）；仅显示已收到的结果，未响应不代表空闲。' -f $checkedCount, $script:scanTotal
 })
 $tabs.Add_SelectedIndexChanged({
-    if ($tabs.SelectedTab -eq $tabScan) { Start-LanScan } else { Stop-LanScan $true }
+    if ($tabs.SelectedTab -eq $tabScan) {
+        # 不自动扫描：只有点击「开始扫描」才启动
+        if (-not $script:scanJob -and $script:scanRows.Count -eq 0) {
+            $scanStatus.Text = '点击「开始扫描」后才会扫描所选网卡的直连网段；未响应不代表空闲。'
+        }
+    } elseif ($script:scanJob) {
+        # 离开扫描页时停止后台扫描，保留已收到的结果
+        $checkedCount = $script:scanJob.Checked
+        Stop-LanScan $false
+        $scanStatus.Text = '已停止（已检查 {0:N0} 个地址）；未响应不代表空闲。' -f $checkedCount
+    }
 })
 $form.Add_FormClosed({ Stop-LanScan $false; $scanTimer.Dispose() })
 
@@ -1152,7 +1162,11 @@ $list.Add_SelectedIndexChanged({
         $lblMacBox.Text = '-'
         foreach ($field in @($txtIp, $txtMask, $txtGw, $txtDns1, $txtDns2)) { $field.Clear() }
     }
-    if ($tabs.SelectedTab -eq $tabScan) { Start-LanScan }
+    # 正在扫描的网段属于原网卡，切换网卡后停止并清空，避免结果张冠李戴
+    if ($script:scanJob) {
+        Stop-LanScan $true
+        $scanStatus.Text = '已切换网卡，扫描已停止；请重新点击「开始扫描」。'
+    }
 })
 
 $btnRefresh.Add_Click({ Refresh-AdapterList })
